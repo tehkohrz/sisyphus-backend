@@ -1,0 +1,23 @@
+{
+  "name": "sisyphus-backend",
+  "version": "1.0.0",
+  "description": "Backend serve for data storage for project sisyphus",
+  "main": "index.mjs",
+  "author": "tehkohrz",
+  "license": "MIT",
+  "devDependencies": {
+    "eslint": "^8.21.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-plugin-import": "^2.26.0",
+    "nodemon": "^2.0.19",
+    "sequelize-cli": "^6.4.1"
+  },
+  "dependencies": {
+    "cookie-parser": "^1.4.6",
+    "cors": "^2.8.5",
+    "express": "^4.18.1",
+    "method-override": "^3.0.0",
+    "pg": "^8.7.3",
+    "sequelize": "^6.21.3"
+  }
+}
