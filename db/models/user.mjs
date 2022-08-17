@@ -25,6 +25,6 @@ export default function initUserModel(sequelize, DataTypes) {
         type: DataTypes.DATE,
       },
     },
-    { underscored: true }
+    { underscored: true },
   );
 }

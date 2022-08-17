@@ -1,14 +1,14 @@
 import { Sequelize } from 'sequelize';
 import url from 'url';
-import allConfig from '../config/config';
+import allConfig from '../config/config.js';
 
-import initJournalModel from './journal';
-import initUserModel from './model';
+import initJournalModel from './journal.mjs';
+import initUserModel from './user.mjs';
 
 const env = process.env.NODE_ENV || 'development';
 const config = allConfig[env];
 
-const db = [];
+const db = {};
 
 let sequelize;
 
@@ -32,8 +32,8 @@ if (env === 'production') {
   sequelize = new Sequelize(config.database, config.username, config.password, config);
 }
 
-db.User = initUserModel(sequelize, Sequelize.DataType);
-db.Journal = initJournalModel(sequelize, Sequelize.DataType);
+db.User = initUserModel(sequelize, Sequelize.DataTypes);
+db.Journal = initJournalModel(sequelize, Sequelize.DataTypes);
 
 db.User.hasMany(db.Journal);
 db.Journal.belongsTo(db.User);

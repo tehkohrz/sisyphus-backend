@@ -1,10 +1,10 @@
-import db from './db/models/index';
-import initJournalsController from './controllers/journals';
-import initUsersController from './controllers/users';
+import db from './db/models/index.mjs';
+import InitJournalsController from './controllers/journals.mjs';
+import InitUsersController from './controllers/users.mjs';
 
-export default function routes(app) {
-  const JournalsController = initJournalsController(db);
-  const UsersController = initUsersController(db);
+export default function bindRoutes(app) {
+  const JournalsController = InitJournalsController(db);
+  const UsersController = InitUsersController(db);
 
   app.post('/user', UsersController.createUser);
   app.get('/user', UsersController.getUser);
@@ -13,10 +13,10 @@ export default function routes(app) {
   app.get('/reAuth', UsersController.reAuth);
   app.delete('/user', UsersController.deleteUser);
 
-  app.get('/journal/:username/:entryId', JournalsController.getJournal);
-  app.get('/journal/:username', JournalsController.getAllJournals);
+  // app.get('/journal/:username/:entryId', JournalsController.getJournal);
+  // app.get('/journal/:username', JournalsController.getAllJournals);
   app.get('/journal/:year/:month', JournalsController.getMonthJournals);
   app.post('/journal/new', JournalsController.createJournal);
-  app.post('/journal/:entryId/save', JournalsController.updateJournal);
-  app.delete('/journal/:entryId/delete');
+  // app.post('/journal/:entryId/save', JournalsController.updateJournal);
+  // app.delete('/journal/:entryId/delete');
 }

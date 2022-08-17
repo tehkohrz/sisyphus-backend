@@ -3,7 +3,7 @@ import express from 'express';
 import methodOverride from 'method-override';
 import cors from 'cors';
 
-import bindRoutes from './routes';
+import bindRoutes from './routes.mjs';
 
 // Initialise Express instance
 const app = express();

@@ -1,13 +1,9 @@
-import { Op } from 'sequelize';
+import { Op, Sequelize } from 'sequelize';
 
-export default class initJournalsController {
-  constructor(db) {
-    this.db = db;
-  }
-
-  async getJournal(req, res) {
+export default function InitJournalsController(db) {
+  async function getJournal(req, res) {
     try {
-      const entry = await this.db.Journal.findOne({
+      const entry = await db.Journal.findOne({
         where: {
           entryId: req.body.entryId,
         },
@@ -19,23 +15,24 @@ export default class initJournalsController {
     }
   }
 
-  async getMonthJournals(req, res) {
+  async function getMonthJournals(req, res) {
     try {
       const { year, month } = req.params;
-      const entries = await this.db.Journal.findAll({
+
+      const entries = await db.Journal.findAll({
         where: {
           [Op.and]: [
             { id: req.cookies.id },
             {
-              date: this.db.where(
-                this.db.fn('MONTH', this.db.col('entry_date')),
-                month
+              date: Sequelize.where(
+                Sequelize.fn('date_part', 'month', Sequelize.col('entry_date')),
+                month,
               ),
             },
             {
-              date: this.db.where(
-                this.db.fn('YEAR', this.db.col('entry_date')),
-                year
+              date: Sequelize.where(
+                Sequelize.fn('date_part', 'year', Sequelize.col('entry_date')),
+                year,
               ),
             },
           ],
@@ -49,9 +46,9 @@ export default class initJournalsController {
   }
 
   // ! See if you can search this way without storing the userId
-  async getAllJournals(req, res) {
+  async function getAllJournals(req, res) {
     try {
-      const entries = await this.db.Journal.findAll({
+      const entries = await db.Journal.findAll({
         include: {
           model: 'user',
           where: {
@@ -66,9 +63,9 @@ export default class initJournalsController {
     }
   }
 
-  async createJournal(req, res) {
+  async function createJournal(req, res) {
     try {
-      const entry = await this.db.Journal.create({
+      const entry = await db.Journal.create({
         userId: req.cookies.id,
         title: req.body.title,
         content: req.body.content,
@@ -81,9 +78,9 @@ export default class initJournalsController {
     }
   }
 
-  async updateJournal(req, res) {
+  async function updateJournal(req, res) {
     try {
-      const updatedEntry = await this.db.Journal.update(
+      const updatedEntry = await db.Journal.update(
         {
           content: req.body.content,
         },
@@ -91,7 +88,7 @@ export default class initJournalsController {
           where: {
             entryId: req.body.entryId,
           },
-        }
+        },
       );
       console.log('Entry updated', updatedEntry);
       res.send({ updatedEntry });
@@ -100,9 +97,9 @@ export default class initJournalsController {
     }
   }
 
-  async deleteJournal(req, res) {
+  async function deleteJournal(req, res) {
     try {
-      await this.db.Journal.destroy({
+      await db.Journal.destroy({
         where: {
           entryId: req.params.entryId,
         },
@@ -112,4 +109,8 @@ export default class initJournalsController {
       console.log(err);
     }
   }
+
+  return {
+    deleteJournal, updateJournal, createJournal, getAllJournals, getMonthJournals, getJournal,
+  };
 }

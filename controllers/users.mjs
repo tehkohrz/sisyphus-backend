@@ -1,13 +1,9 @@
-export default class initUsersController {
-  constructor(db) {
-    this.db = db;
-  }
-
+export default function initUsersController(db) {
   // Create new user
-  async createUser(req, res) {
+  async function createUser(req, res) {
     try {
       // Checks for an exiting user and throws error if found
-      const existingUser = await this.db.User.findOne({
+      const existingUser = await db.User.findOne({
         where: {
           username: req.body.username,
         },
@@ -16,7 +12,7 @@ export default class initUsersController {
         throw new Error('User exists');
       }
 
-      const newUser = await this.db.User.create({
+      const newUser = await db.User.create({
         username: req.body.username,
         password: req.body.password,
       });
@@ -31,11 +27,11 @@ export default class initUsersController {
     }
   }
 
-  async getUser(req, res) {
+  async function getUser(req, res) {
     try {
-      const userData = await this.db.User.findOne({
+      const userData = await db.User.findOne({
         where: {
-          username: req.body.username,
+          username: req.cookies.username,
         },
       });
       res.send({ userData });
@@ -44,10 +40,10 @@ export default class initUsersController {
     }
   }
 
-  async deleteUser(req, res) {
+  async function deleteUser(req, res) {
     try {
       let success = false;
-      await this.db.User.destroy({
+      await db.User.destroy({
         where: {
           username: req.cookies.username,
         },
@@ -61,10 +57,10 @@ export default class initUsersController {
     }
   }
 
-  async signIn(req, res) {
+  async function signIn(req, res) {
     try {
       // Get user data
-      const user = await this.db.User.findOne({
+      const user = await db.User.findOne({
         where: {
           username: req.body.username,
         },
@@ -91,7 +87,7 @@ export default class initUsersController {
     }
   }
 
-  logout(req, res) {
+  function logout(req, res) {
     // Clearing cookies on client side
     // This might not work as it clears cookies on the server and not cilent side
     res.clearCookie('username');
@@ -101,7 +97,7 @@ export default class initUsersController {
     // res.cookie('id', '', { expires: Date.now() });
   }
 
-  async reAuth(req, res) {
+  async function reAuth(req, res) {
     const { username, id } = req.cookies;
     // If there are no cookies
     if (!username || !id) {
@@ -109,7 +105,7 @@ export default class initUsersController {
     }
     // Check that the cookies do exist
     if (username && id) {
-      const user = await this.db.User.findOne({
+      const user = await db.User.findOne({
         where: {
           id,
         },
@@ -125,4 +121,8 @@ export default class initUsersController {
       }
     }
   }
+
+  return {
+    getUser, reAuth, logout, signIn, deleteUser, createUser,
+  };
 }
