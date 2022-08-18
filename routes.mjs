@@ -13,10 +13,10 @@ export default function bindRoutes(app) {
   app.get('/reAuth', UsersController.reAuth);
   app.delete('/user', UsersController.deleteUser);
 
-  // app.get('/journal/:username/:entryId', JournalsController.getJournal);
-  // app.get('/journal/:username', JournalsController.getAllJournals);
+  app.get('/journal/:year/:month/:date', JournalsController.getEntry);
   app.get('/journal/:year/:month', JournalsController.getMonthJournals);
   app.post('/journal/new', JournalsController.createJournal);
+  // app.get('/journal/:username', JournalsController.getAllJournals);
   // app.post('/journal/:entryId/save', JournalsController.updateJournal);
   // app.delete('/journal/:entryId/delete');
 }

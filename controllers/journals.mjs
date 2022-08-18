@@ -1,45 +1,66 @@
 import { Op, Sequelize } from 'sequelize';
 
 export default function InitJournalsController(db) {
-  async function getJournal(req, res) {
+  // Gets single entry
+  async function getEntry(req, res) {
     try {
+      const { year, month, date } = req.params;
       const entry = await db.Journal.findOne({
         where: {
-          entryId: req.body.entryId,
-        },
-      });
-      console.log('Entry retreived', entry);
-      res.send({ entry });
-    } catch (err) {
-      console.log(err);
-    }
-  }
-
-  async function getMonthJournals(req, res) {
-    try {
-      const { year, month } = req.params;
-
-      const entries = await db.Journal.findAll({
-        where: {
           [Op.and]: [
-            { id: req.cookies.id },
+            { user_id: req.cookies.id },
             {
               date: Sequelize.where(
                 Sequelize.fn('date_part', 'month', Sequelize.col('entry_date')),
-                month,
+                month
               ),
             },
             {
               date: Sequelize.where(
                 Sequelize.fn('date_part', 'year', Sequelize.col('entry_date')),
-                year,
+                year
+              ),
+            },
+            {
+              // day of month
+              date: Sequelize.where(
+                Sequelize.fn('date_part', 'd', Sequelize.col('entry_date')),
+                date
               ),
             },
           ],
         },
       });
-      console.log({ entries });
-      res.send({ entries });
+      res.send(entry);
+    } catch (err) {
+      console.log(err);
+    }
+  }
+  // ONLY GETS THE DATE FOR THE MONTH
+  async function getMonthJournals(req, res) {
+    try {
+      const { year, month } = req.params;
+      const entries = await db.Journal.findAll({
+        attributes: ['entry_date'],
+        where: {
+          [Op.and]: [
+            { user_id: req.cookies.id },
+            {
+              date: Sequelize.where(
+                Sequelize.fn('date_part', 'month', Sequelize.col('entry_date')),
+                month
+              ),
+            },
+            {
+              date: Sequelize.where(
+                Sequelize.fn('date_part', 'year', Sequelize.col('entry_date')),
+                year
+              ),
+            },
+          ],
+        },
+      });
+      res.send(entries);
     } catch (err) {
       console.log(err);
     }
@@ -88,7 +109,7 @@ export default function InitJournalsController(db) {
           where: {
             entryId: req.body.entryId,
           },
-        },
+        }
       );
       console.log('Entry updated', updatedEntry);
       res.send({ updatedEntry });
@@ -111,6 +132,11 @@ export default function InitJournalsController(db) {
   }
 
   return {
-    deleteJournal, updateJournal, createJournal, getAllJournals, getMonthJournals, getJournal,
+    deleteJournal,
+    updateJournal,
+    createJournal,
+    getAllJournals,
+    getMonthJournals,
+    getEntry,
   };
 }
