@@ -84,35 +84,62 @@ export default function InitJournalsController(db) {
     }
   }
 
-  async function createJournal(req, res) {
-    try {
-      const entry = await db.Journal.create({
-        userId: req.cookies.id,
-        title: req.body.title,
-        content: req.body.content,
-        entryDate: req.body.date,
-      });
-      console.log('Entry created', entry);
-      res.send(entry);
-    } catch (err) {
-      console.log(err);
-    }
-  }
-
+  // Post and updaet journal entries
   async function updateJournal(req, res) {
     try {
-      const updatedEntry = await db.Journal.update(
-        {
-          content: req.body.content,
+      let success = false;
+      const { selectedEntry } = req.body;
+      console.log(selectedEntry);
+      const date = new Date(selectedEntry.entry_date);
+      // Looking for existing entry
+      const existingEntry = await db.Journal.findOne({
+        where: {
+          [Op.and]: [
+            { user_id: req.cookies.id },
+            {
+              date: Sequelize.where(
+                Sequelize.fn('date_part', 'month', Sequelize.col('entry_date')),
+                date.getMonth() + 1
+              ),
+            },
+            {
+              date: Sequelize.where(
+                Sequelize.fn('date_part', 'year', Sequelize.col('entry_date')),
+                date.getFullYear()
+              ),
+            },
+            {
+              // day of month
+              date: Sequelize.where(
+                Sequelize.fn('date_part', 'd', Sequelize.col('entry_date')),
+                date.getDate()
+              ),
+            },
+          ],
         },
-        {
-          where: {
-            entryId: req.body.entryId,
-          },
-        }
-      );
-      console.log('Entry updated', updatedEntry);
-      res.send({ updatedEntry });
+      });
+      console.log('Entry created', existingEntry);
+      // Update existing entry
+      if (existingEntry) {
+        await existingEntry.update({
+          title: selectedEntry.title,
+          content: selectedEntry.content,
+          updatedAt: Date.now(),
+        });
+        success = true;
+        res.send(success);
+      }
+      // If entry does not exist create new one
+      if (!existingEntry) {
+        const entry = await db.Journal.create({
+          userId: req.cookies.id,
+          title: selectedEntry.title,
+          content: selectedEntry.content,
+          entryDate: date,
+        });
+        console.log('New Entry created', entry);
+        res.send(entry);
+      }
     } catch (err) {
       console.log(err);
     }
@@ -134,7 +161,6 @@ export default function InitJournalsController(db) {
   return {
     deleteJournal,
     updateJournal,
-    createJournal,
     getAllJournals,
     getMonthJournals,
     getEntry,

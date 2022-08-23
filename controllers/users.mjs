@@ -59,31 +59,31 @@ export default function initUsersController(db) {
 
   async function signIn(req, res) {
     try {
+      console.log(req.body);
       // Get user data
       const user = await db.User.findOne({
         where: {
           username: req.body.username,
         },
       });
+
       // Password not match or usernot found
       if (!user) {
-        const error = new Error('User not found');
-        res.send(error);
+        throw new Error('User not found');
       }
       if (user.password !== req.body.password) {
-        const error = new Error('Password wrong.');
-        res.send(error);
+        throw new Error('Password incorrect');
       }
       // User found and password correct
       if (user.password === req.body.password) {
         // Set cookie
-        res.cookie('Username', user.username);
+        console.log('Set Cookeis');
+        res.cookie('username', user.username);
         res.cookie('id', user.id);
       }
-      res.send({ user });
+      res.send(user);
     } catch (err) {
-      console.log(err);
-      res.send({ success: false });
+      res.status(400).send({ errMsg: err.message });
     }
   }
 
@@ -117,12 +117,18 @@ export default function initUsersController(db) {
         res.send({ success: false });
       }
       if (user.username === username) {
+        console.log('backend login');
         res.send({ success: true, user });
       }
     }
   }
 
   return {
-    getUser, reAuth, logout, signIn, deleteUser, createUser,
+    getUser,
+    reAuth,
+    logout,
+    signIn,
+    deleteUser,
+    createUser,
   };
 }

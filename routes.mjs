@@ -8,14 +8,14 @@ export default function bindRoutes(app) {
 
   app.post('/user', UsersController.createUser);
   app.get('/user', UsersController.getUser);
-  app.get('/signin', UsersController.signIn);
+  app.post('/signIn', UsersController.signIn);
   app.get('/logout', UsersController.logout);
   app.get('/reAuth', UsersController.reAuth);
   app.delete('/user', UsersController.deleteUser);
 
   app.get('/journal/:year/:month/:date', JournalsController.getEntry);
   app.get('/journal/:year/:month', JournalsController.getMonthJournals);
-  app.post('/journal/new', JournalsController.createJournal);
+  app.post('/journal/post', JournalsController.updateJournal);
   // app.get('/journal/:username', JournalsController.getAllJournals);
   // app.post('/journal/:entryId/save', JournalsController.updateJournal);
   // app.delete('/journal/:entryId/delete');
